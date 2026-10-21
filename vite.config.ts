@@ -97,7 +97,7 @@ export default defineConfig(({ command }) => {
   return {
     // GitHub Pages project URL:
     // https://webtester976.github.io/workmonitor/
-    base: '/workmonitor/',
+   base: '/workmonitor-timer-Mohit/',
 
     plugins: [
       react(),
