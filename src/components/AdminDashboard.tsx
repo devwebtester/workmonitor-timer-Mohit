@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 
 import { apiFetch } from '../lib/api';
+import { ReportExportButtons } from './ReportExportButtons';
+import type { ReportRow } from '../lib/exportService';
 
 
 interface AdminDashboardProps {
@@ -2040,6 +2042,36 @@ React.FC<AdminDashboardProps> = ({
       {activeTab ===
         'employees' && (
 
+        <div className="space-y-3">
+
+        <ReportExportButtons
+          fileName="admin-work-report"
+          loadRows={async () => {
+            const all: ReportRow[] = [];
+            for (const emp of centralUsers) {
+              const res = await apiFetch(
+                `/api/activity-history/${encodeURIComponent(emp.id)}`,
+                { method: 'GET', cache: 'no-store' }
+              );
+              const data = await readApiJson(res);
+              if (!res.ok || !data?.success) {
+                throw new Error(data?.error || 'Failed to load history');
+              }
+              (Array.isArray(data.records) ? data.records : []).forEach(
+                (r: ActivityHistoryRow) =>
+                  all.push({
+                    employeeName: emp.name,
+                    email: emp.email,
+                    date: r.dateKey,
+                    totalSeconds: r.totalSeconds,
+                    screenshots: r.screenshotCount,
+                  })
+              );
+            }
+            return all;
+          }}
+        />
+
         <div className="
           bg-white
           dark:bg-slate-900
@@ -2341,6 +2373,8 @@ React.FC<AdminDashboardProps> = ({
             </tbody>
 
           </table>
+
+        </div>
 
         </div>
 

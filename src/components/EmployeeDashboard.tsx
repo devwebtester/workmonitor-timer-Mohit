@@ -3098,6 +3098,7 @@
 
 
 
+import { ReportExportButtons } from './ReportExportButtons';
 import React, {
   useEffect,
   useMemo,
@@ -5938,6 +5939,56 @@ export const EmployeeDashboard:
             </div>
 
           </div>
+
+          {activityHistory.length > 0 && (
+            <ReportExportButtons
+              fileName={`work-report_${currentUser.name.replace(/\s+/g, '_')}`}
+              loadRows={async () => {
+                // Always fetch fresh data so the export matches what the
+                // dashboard shows right now (not the list loaded earlier).
+                const res = await fetch(
+                  `${backendUrl}/api/activity-history/${encodeURIComponent(currentUser.id)}`,
+                  { cache: 'no-store', headers: backendHeaders }
+                );
+                const data = await readApiJson(res);
+                if (!res.ok || !data?.success) {
+                  throw new Error(data?.error || 'Failed to load history');
+                }
+                const records: ActivityHistoryRecord[] = (
+                  Array.isArray(data.records) ? data.records : []
+                ).map((r: ActivityHistoryRecord) => ({ ...r }));
+
+                // The server only learns about live time and screenshots after
+                // periodic syncs/hourly uploads, so merge in what the dashboard
+                // is showing right now for today / the selected date.
+                const today = getTodayDateKey();
+                const ensure = (dateKey: string) => {
+                  let rec = records.find((r) => r.dateKey === dateKey);
+                  if (!rec) {
+                    rec = { dateKey, totalSeconds: 0, screenshotCount: 0 };
+                    records.push(rec);
+                  }
+                  return rec;
+                };
+                if (dayTotalSeconds > 0) {
+                  const rec = ensure(today);
+                  rec.totalSeconds = Math.max(rec.totalSeconds, dayTotalSeconds);
+                }
+                if (selectedDateScreenshotCount > 0) {
+                  const rec = ensure(selectedDate);
+                  rec.screenshotCount = Math.max(rec.screenshotCount, selectedDateScreenshotCount);
+                }
+
+                return records.map((r) => ({
+                  employeeName: currentUser.name,
+                  email: currentUser.email,
+                  date: r.dateKey,
+                  totalSeconds: r.totalSeconds,
+                  screenshots: r.screenshotCount,
+                }));
+              }}
+            />
+          )}
 
           {/* YEAR > MONTH > DATE HISTORY */}
 
