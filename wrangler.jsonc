@@ -18,11 +18,17 @@
 			"database_id": "ecffd220-5f6d-4c07-a7c1-81d6765d57d1"
 		}
 	],
+	"triggers": {
+		"crons": [
+			"30 12 * * 5",
+			"30 3 * * 2-6"
+		]
+	},
 	"kv_namespaces": [
 		{
 			"binding": "SCREENSHOTS",
 			"id": "ee8e527fbb8b4958926a639b760e4055",
-			"remote": true
+			"remote": false
 		}
 	]
 }

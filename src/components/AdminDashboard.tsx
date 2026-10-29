@@ -23,6 +23,7 @@ import {
 
 import { apiFetch } from '../lib/api';
 import { TimeActivityReport } from './TimeActivityReport';
+import { EmailReportCard } from './EmailReportCard';
 
 
 interface AdminDashboardProps {
@@ -2425,7 +2426,21 @@ trackedSeconds: Number(snapshot.trackedSeconds || 0),
       {/* ================================================================
           TIME & ACTIVITY REPORT
       ================================================================= */}
-
+            {activeTab === 'reports' && (
+        <EmailReportCard
+          mode="admin"
+          currentUser={{
+            id: adminUser.id,
+            name: adminUser.name,
+            email: adminUser.email,
+          }}
+          members={centralUsers.map((u) => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+          }))}
+        />
+      )}
       {activeTab === 'reports' && (
         <TimeActivityReport
           fileName="work-report"

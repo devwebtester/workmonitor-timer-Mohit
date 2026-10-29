@@ -9685,6 +9685,7 @@
 
 
 import { TimeActivityReport } from './TimeActivityReport';
+import { EmailReportCard } from './EmailReportCard';
 import React, {
   useEffect,
   useMemo,
@@ -12666,6 +12667,15 @@ saveActivityCounts(currentUser.id, selectedDate, fileKey, mergedCounts);
       </div>
 
       {/* TIME & ACTIVITY REPORT (own data only) */}
+
+        <EmailReportCard
+        mode="employee"
+        currentUser={{
+          id: currentUser.id,
+          name: currentUser.name,
+          email: currentUser.email,
+        }}
+      />
 
       <TimeActivityReport
         title="My time and activity report"

@@ -3240,6 +3240,15 @@
 
 
 
+import {
+  handleEmployeeReportLog,
+  handleReportLog,
+  handleSendReportFromAdmin,
+  handleSendReportFromEmployee,
+  handleSendReportNow,
+  runScheduledReport,
+} from './weeklyReport.js';
+
 function json(data, status = 200) {
   return Response.json(data, {
     status,
@@ -5293,6 +5302,46 @@ snapshots: (result.results || []).map((row) => {
   }
 
   // ====================================================
+  // MANUAL TRIGGER FOR THE E-MAIL REPORT (needs REPORT_TRIGGER_SECRET)
+  // ====================================================
+
+  if (
+    method === 'POST' &&
+    pathname === '/api/admin/send-report-now'
+  ) {
+    return handleSendReportNow(request, env, json);
+  }
+
+  if (
+    method === 'GET' &&
+    pathname === '/api/admin/report-log'
+  ) {
+    return handleReportLog(env, json);
+  }
+
+  if (
+    method === 'POST' &&
+    pathname === '/api/admin/send-report'
+  ) {
+    return handleSendReportFromAdmin(request, env, json);
+  }
+
+  if (
+    method === 'GET' &&
+    pathname === '/api/employee/report-log'
+  ) {
+    return handleEmployeeReportLog(request, env, json);
+  }
+
+  if (
+    method === 'POST' &&
+    pathname === '/api/employee/send-report'
+  ) {
+    return handleSendReportFromEmployee(request, env, json);
+  }
+
+
+  // ====================================================
   // ACTIVITY HISTORY
   // ====================================================
 
@@ -6691,5 +6740,18 @@ export default {
       request
     );
   },
-};
 
+  // Cron Triggers (see "triggers" in wrangler.jsonc): daily / weekly e-mail report.
+  async scheduled(
+    event,
+    env,
+    ctx
+  ) {
+    ctx.waitUntil(
+      runScheduledReport(
+        env,
+        event.cron
+      )
+    );
+  },
+};
