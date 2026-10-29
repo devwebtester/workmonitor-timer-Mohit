@@ -21,6 +21,10 @@ import { apiFetch } from '../lib/api';
 
 const MAX_DAYS = 90;
 
+// The history table (automatic + manual sends) is hidden for now.
+// Set to true to show it again. The Worker keeps writing the log either way.
+const SHOW_HISTORY = false;
+
 type PresetKey =
   | 'today'
   | 'yesterday'
@@ -452,6 +456,7 @@ export const EmailReportCard: React.FC<Props> = ({
       )}
 
       {/* ------------------------------ history ------------------------------ */}
+      {SHOW_HISTORY && (
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
@@ -518,6 +523,7 @@ export const EmailReportCard: React.FC<Props> = ({
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 };
